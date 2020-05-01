@@ -61,6 +61,34 @@ app.post('/addcart', function(request, response, next) {
 	
 });
 
+app.get('/cart',function(request,response) {
+	console.log('In cart request');
+	db.query('select products.id,products.name,products.quantity,products.price from products inner join cart on cart.productid=products.id where cart.customerid=1;',function(err,result,fields){
+    	if(err){
+    		throw err;
+    	}
+    	else{
+    		console.log(result);
+    		//console.log(result.RowDataPacket.productid);
+    		response.render('cart',{title:'cart',customerproduct:result});
+    	}
+	});
+});
+
+app.post('/deletefromcart',function(request,response){
+  console.log('In delete from cart');
+  db.query('delete from cart where productid='+request.body.productId+' and customerid=1',function(err,result,fields){
+    if(err){
+      throw err;
+    }else{
+      console.log(result);
+      response.send('success');
+    }
+  });
+
+});
+
+
 console.log("The dir name is " +__dirname);
 console.log("App is running");
 app.listen(3000);

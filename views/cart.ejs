@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!-- <title>Login Form Tutorial</title> -->
+    <title><%= siteTitle+' | '+title %></title>
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+     
+      <link rel="shortcut icon" href="https://via.placeholder.com/16/007bff/007bff" type="image/x-icon">
+     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="shortcut icon" href="https://via.placeholder.com/16/007bff/007bff" type="image/x-icon">
+      
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<%- include ('include/header'); %>
+  <%- include ('include/toaster'); %>
+ 	<div class="jumbotron text-center">
+      	<h1>CART PAGE</h1>
+      	<p>Resize this responsive page to see the effect!</p> 
+    </div>
+    <div class="container">
+    	
+    		<% if(customerproduct.length > 0) { %>
+        <div id="cartpresent">
+      		<div class="table-responsive">
+        		<table class="table" id="cart">
+          			<thead>
+            			<tr>
+              			<th>Product</th>
+              			<th>Price</th>
+              			<th>Quantity</th>
+              			<th>Instock</th>
+              			<th>Action</th>
+            			</tr>
+          			</thead>
+          			<tbody>
+          				<% customerproduct.forEach((product)=>{ %>
+       			       <tr>
+
+			              <td><a class="text-body" href="/product/<%= product.pid %>"> <%= product.id %> </a><br><span class="badge badge-warning"><%= product.name %></span></td>
+			              <td>₹<%= product.price %></td>
+			              <td><input type="number" style="width: 70px;" min="1" name="qnt" value="1"/></td>
+			              <td><%= product.quantity %></td>
+			              <td><button class="btn btn-danger"  onclick="deleteFromCart(this,<%= product.id%>)">Delete</button></td>
+            			</tr>
+          <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <div class="clearfix"></div>
+      <a href="/empty-cart" class="btn btn-danger float-left">Clear cart</a>
+      <a href="/checkout" class="btn btn-primary float-right">Checkout</a>
+      <button class="btn btn-success float-right" style="margin-right: 10px;">Update</button>
+      <div class="clearfix"></div>
+    </div>
+    <% } else { %>
+    <div>
+      <p>Your cart is empty. <a href="/products">Continue shopping</a> </p>
+    </div>
+    <% } %>
+    <div id="cartempty">
+      <p>Your cart is empty. <a href="/products">Continue shopping</a> </p>
+    </div>
+  </div>
+<script type="text/javascript">
+  document.getElementById("cartempty").style.display='none';
+  let deleteFromCart=(self,productId)=>{
+    axios({
+        method: 'post',
+        url: '/deletefromcart',
+        data: {
+        productId:productId
+      }
+      }).then(function (response) {
+        console.log(response);
+        if(response.data==='success'){
+             var i = self.parentNode.parentNode.rowIndex;
+            document.getElementById("cart").deleteRow(i);
+            toasterView(); 
+            if((document.getElementById("cart").rows.length - 1 )==0){
+              document.getElementById("cartpresent").style.display='none';
+                document.getElementById("cartempty").style.display='block';
+              
+            }
+
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+  };
+   let toasterView=()=>{
+     $('.toast').toast('show');
+       setTimeout(()=>{ 
+        $('.toast').toast('hide'); 
+      }, 2000);
+     };
+
+</script>
+</body>
+
+</html>
